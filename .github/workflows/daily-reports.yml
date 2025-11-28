@@ -51,9 +51,11 @@ jobs:
           rclone version
 
       - name: Configure rclone for Google Drive
+        env:
+          RCLONE_CONFIG_CONTENTS: ${{ secrets.RCLONE_CONFIG }}
         run: |
           mkdir -p ~/.config/rclone
-          echo "${{ secrets.RCLONE_CONFIG }}" > ~/.config/rclone/rclone.conf
+          printf '%s\n' "$RCLONE_CONFIG_CONTENTS" > ~/.config/rclone/rclone.conf
 
       - name: Create .env file
         run: |
