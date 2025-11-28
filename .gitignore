@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Environment files (contains secrets)
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Downloads (generated reports)
+downloads/
+
+# State files (contains session data)
+state/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Release builds
+release/
+
+# Rclone config (contains tokens)
+rclone.conf

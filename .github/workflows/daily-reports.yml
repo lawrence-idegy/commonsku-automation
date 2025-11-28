@@ -1,0 +1,107 @@
+name: CommonSKU Daily Reports
+
+on:
+  # Scheduled run - 5 PM EST (22:00 UTC) on weekdays
+  schedule:
+    - cron: '0 22 * * 1-5'  # Mon-Fri at 5 PM EST (10 PM UTC)
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      report_type:
+        description: 'Report type to run'
+        required: true
+        default: 'scheduled'
+        type: choice
+        options:
+          - scheduled
+          - daily
+          - weekly
+          - monthly
+          - friday
+          - all
+
+jobs:
+  run-reports:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Setup rclone
+        run: |
+          curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
+          unzip rclone-current-linux-amd64.zip
+          sudo cp rclone-*-linux-amd64/rclone /usr/local/bin/
+          sudo chmod +x /usr/local/bin/rclone
+          rclone version
+
+      - name: Configure rclone for Google Drive
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONFIG }}" > ~/.config/rclone/rclone.conf
+
+      - name: Create .env file
+        run: |
+          cat << EOF > .env
+          COMMONSKU_URL=${{ secrets.COMMONSKU_URL }}
+          COMMONSKU_USERNAME=${{ secrets.COMMONSKU_USERNAME }}
+          COMMONSKU_PASSWORD=${{ secrets.COMMONSKU_PASSWORD }}
+          HEADLESS=true
+          DOWNLOAD_DIR=./downloads
+          NAVIGATION_TIMEOUT=60000
+          ACTION_TIMEOUT=30000
+          MAX_RETRIES=3
+          RETRY_DELAY=5000
+          DEBUG=true
+          GOOGLE_DRIVE_ENABLED=true
+          GOOGLE_DRIVE_UPLOAD_AFTER_EACH=true
+          EOF
+
+      - name: Create downloads directory
+        run: mkdir -p downloads
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Run reports (scheduled)
+        if: github.event_name == 'schedule' || github.event.inputs.report_type == 'scheduled'
+        run: node dist/index.js scheduled
+        env:
+          NODE_ENV: production
+
+      - name: Run reports (manual)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.report_type != 'scheduled'
+        run: node dist/index.js ${{ github.event.inputs.report_type }}
+        env:
+          NODE_ENV: production
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ github.run_id }}
+          path: logs/
+          retention-days: 7
+
+      - name: Upload downloaded reports as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ github.run_id }}
+          path: downloads/
+          retention-days: 7
