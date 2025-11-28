@@ -104,6 +104,24 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Force upload to Google Drive
+        if: always()
+        run: |
+          echo "=== Uploading reports to Google Drive ==="
+          echo "Files in downloads folder:"
+          ls -la downloads/
+
+          # Upload current data (Today, This Week, This Month, This Year)
+          for file in downloads/*.csv; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file")
+              echo "Uploading $filename to Current Data folder..."
+              rclone copyto "$file" "gdrive:,folder_id=1opWJ_3RsH65sQ8GYWhMkpB5jL9WaKyRM/$filename" --verbose
+            fi
+          done
+
+          echo "=== Upload complete ==="
+
       - name: Upload logs as artifact
         if: always()
         uses: actions/upload-artifact@v4
