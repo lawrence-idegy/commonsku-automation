@@ -42,7 +42,10 @@
       "Bash(git remote add:*)",
       "Bash(git push:*)",
       "Bash(git remote:*)",
-      "Bash(gh auth status:*)"
+      "Bash(gh auth status:*)",
+      "Bash(git credential-manager:*)",
+      "Bash(git credential:*)",
+      "Bash(cmdkey /delete:git:https://github.com:*)"
     ],
     "deny": [],
     "ask": []
