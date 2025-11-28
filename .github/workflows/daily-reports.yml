@@ -56,11 +56,15 @@ jobs:
           echo '${{ secrets.RCLONE_CONFIG }}' | base64 -d > ~/.config/rclone/rclone.conf
 
       - name: Create .env file
+        env:
+          COMMONSKU_URL: ${{ secrets.COMMONSKU_URL }}
+          COMMONSKU_USERNAME: ${{ secrets.COMMONSKU_USERNAME }}
+          COMMONSKU_PASSWORD: ${{ secrets.COMMONSKU_PASSWORD }}
         run: |
-          cat << EOF > .env
-          COMMONSKU_URL=${{ secrets.COMMONSKU_URL }}
-          COMMONSKU_USERNAME=${{ secrets.COMMONSKU_USERNAME }}
-          COMMONSKU_PASSWORD=${{ secrets.COMMONSKU_PASSWORD }}
+          cat > .env << ENVFILE
+          COMMONSKU_URL=${COMMONSKU_URL}
+          COMMONSKU_USERNAME=${COMMONSKU_USERNAME}
+          COMMONSKU_PASSWORD=${COMMONSKU_PASSWORD}
           HEADLESS=true
           DOWNLOAD_DIR=./downloads
           NAVIGATION_TIMEOUT=60000
@@ -70,7 +74,10 @@ jobs:
           DEBUG=true
           GDRIVE_ENABLED=true
           GDRIVE_UPLOAD_AFTER_EACH=true
-          EOF
+          ENVFILE
+          sed -i 's/^[[:space:]]*//' .env
+          echo "--- .env file created ---"
+          cat .env | grep -v PASSWORD
 
       - name: Create downloads directory
         run: mkdir -p downloads
