@@ -111,12 +111,21 @@ jobs:
           echo "Files in downloads folder:"
           ls -la downloads/
 
-          # Upload current data (Today, This Week, This Month, This Year)
+          CURRENT_FOLDER="1opWJ_3RsH65sQ8GYWhMkpB5jL9WaKyRM"
+          PREVIOUS_FOLDER="1EZdpKoVMCFBKbEfGMyxly3iZlrTjmcrm"
+
           for file in downloads/*.csv; do
             if [ -f "$file" ]; then
               filename=$(basename "$file")
-              echo "Uploading $filename to Current Data folder..."
-              rclone copyto "$file" "gdrive:,folder_id=1opWJ_3RsH65sQ8GYWhMkpB5jL9WaKyRM/$filename" --verbose
+
+              # Check if it's "previous" data (last week, last month, etc.)
+              if echo "$filename" | grep -qi "previous\|last\|prev"; then
+                echo "Uploading $filename to Previous Data folder..."
+                rclone copy "$file" "gdrive:" --drive-root-folder-id "$PREVIOUS_FOLDER" --verbose
+              else
+                echo "Uploading $filename to Current Data folder..."
+                rclone copy "$file" "gdrive:" --drive-root-folder-id "$CURRENT_FOLDER" --verbose
+              fi
             fi
           done
 
