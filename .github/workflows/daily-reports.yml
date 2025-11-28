@@ -68,8 +68,8 @@ jobs:
           MAX_RETRIES=3
           RETRY_DELAY=5000
           DEBUG=true
-          GOOGLE_DRIVE_ENABLED=true
-          GOOGLE_DRIVE_UPLOAD_AFTER_EACH=true
+          GDRIVE_ENABLED=true
+          GDRIVE_UPLOAD_AFTER_EACH=true
           EOF
 
       - name: Create downloads directory
