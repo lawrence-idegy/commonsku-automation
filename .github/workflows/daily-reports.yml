@@ -75,6 +75,13 @@ jobs:
       - name: Create downloads directory
         run: mkdir -p downloads
 
+      - name: Verify rclone config
+        run: |
+          echo "Checking rclone remotes..."
+          rclone listremotes
+          echo "Testing Google Drive access..."
+          rclone lsd gdrive: --max-depth 1 || echo "Could not list Drive root"
+
       - name: Build TypeScript
         run: npm run build
 
