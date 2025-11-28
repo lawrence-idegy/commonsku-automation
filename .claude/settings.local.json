@@ -37,7 +37,12 @@
       "Bash(\"C:\\Users\\Lawrence\\AppData\\Local\\Programs\\rclone\\rclone.exe\" delete \"gdrive:,folder_id=1EZdpKoVMCFBKbEfGMyxly3iZlrTjmcrm/test-previous.csv\")",
       "Bash(git init:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git remote:*)",
+      "Bash(gh auth status:*)"
     ],
     "deny": [],
     "ask": []
