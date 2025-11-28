@@ -45,7 +45,8 @@
       "Bash(gh auth status:*)",
       "Bash(git credential-manager:*)",
       "Bash(git credential:*)",
-      "Bash(cmdkey /delete:git:https://github.com:*)"
+      "Bash(cmdkey /delete:git:https://github.com:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
