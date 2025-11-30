@@ -104,31 +104,70 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Force upload to Google Drive
+      - name: Upload to Google Drive
         if: always()
         run: |
           echo "=== Uploading reports to Google Drive ==="
-          echo "Files in downloads folder:"
-          ls -la downloads/
 
           CURRENT_FOLDER="1opWJ_3RsH65sQ8GYWhMkpB5jL9WaKyRM"
           PREVIOUS_FOLDER="1EZdpKoVMCFBKbEfGMyxly3iZlrTjmcrm"
 
-          for file in downloads/*.csv; do
-            if [ -f "$file" ]; then
-              filename=$(basename "$file")
+          upload_file() {
+            local file="$1"
+            local folder_id="$2"
+            local folder_name="$3"
+            local filename=$(basename "$file")
+            echo "  -> $filename to $folder_name"
+            rclone copy "$file" "gdrive:" --drive-root-folder-id "$folder_id" -v
+          }
 
-              # Check if it's "previous" data (last week, last month, etc.)
-              if echo "$filename" | grep -qi "previous\|last\|prev"; then
-                echo "Uploading $filename to Previous Data folder..."
-                rclone copy "$file" "gdrive:" --drive-root-folder-id "$PREVIOUS_FOLDER" --verbose
-              else
-                echo "Uploading $filename to Current Data folder..."
-                rclone copy "$file" "gdrive:" --drive-root-folder-id "$CURRENT_FOLDER" --verbose
-              fi
-            fi
+          echo ""
+          echo "=== CURRENT DATA (Today, This Week, This Month, YTD) ==="
+
+          # Root level daily files -> Current
+          for file in downloads/*.csv; do
+            [ -f "$file" ] && upload_file "$file" "$CURRENT_FOLDER" "Current Data"
           done
 
+          # current-week folder -> Current
+          if [ -d "downloads/current-week" ]; then
+            for file in downloads/current-week/*.csv; do
+              [ -f "$file" ] && upload_file "$file" "$CURRENT_FOLDER" "Current Data"
+            done
+          fi
+
+          # current-month folder -> Current
+          if [ -d "downloads/current-month" ]; then
+            for file in downloads/current-month/*.csv; do
+              [ -f "$file" ] && upload_file "$file" "$CURRENT_FOLDER" "Current Data"
+            done
+          fi
+
+          # ytd folder -> Current
+          if [ -d "downloads/ytd" ]; then
+            for file in downloads/ytd/*.csv; do
+              [ -f "$file" ] && upload_file "$file" "$CURRENT_FOLDER" "Current Data"
+            done
+          fi
+
+          echo ""
+          echo "=== PREVIOUS DATA (Last Week, Last Month) ==="
+
+          # previous-week folder -> Previous
+          if [ -d "downloads/previous-week" ]; then
+            for file in downloads/previous-week/*.csv; do
+              [ -f "$file" ] && upload_file "$file" "$PREVIOUS_FOLDER" "Previous Data"
+            done
+          fi
+
+          # previous-month folder -> Previous
+          if [ -d "downloads/previous-month" ]; then
+            for file in downloads/previous-month/*.csv; do
+              [ -f "$file" ] && upload_file "$file" "$PREVIOUS_FOLDER" "Previous Data"
+            done
+          fi
+
+          echo ""
           echo "=== Upload complete ==="
 
       - name: Upload logs as artifact
