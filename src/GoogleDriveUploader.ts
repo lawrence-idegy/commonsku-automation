@@ -66,15 +66,27 @@ export class GoogleDriveUploader {
       execSync('rclone version', { stdio: 'ignore' });
       return 'rclone';
     } catch {
-      // Try common installation paths
+      // Try common installation paths (including user-specific locations)
+      const userProfile = process.env.USERPROFILE || process.env.HOME || '';
+      const localAppData = process.env.LOCALAPPDATA || path.join(userProfile, 'AppData', 'Local');
+
       const commonPaths = [
+        // User-specific installation paths (most common for Windows installers)
+        path.join(localAppData, 'Programs', 'rclone', 'rclone.exe'),
+        path.join(userProfile, 'AppData', 'Local', 'Programs', 'rclone', 'rclone.exe'),
+        path.join(userProfile, 'scoop', 'apps', 'rclone', 'current', 'rclone.exe'),
+        // System-wide installation paths
         'C:\\Windows\\System32\\rclone.exe',
         'C:\\Program Files\\rclone\\rclone.exe',
+        'C:\\Program Files (x86)\\rclone\\rclone.exe',
         path.join(process.env.PROGRAMFILES || 'C:\\Program Files', 'rclone', 'rclone.exe'),
+        // Chocolatey installation path
+        'C:\\ProgramData\\chocolatey\\bin\\rclone.exe',
       ];
 
       for (const rclonePath of commonPaths) {
         if (fs.existsSync(rclonePath)) {
+          logger.info(`Found rclone at: ${rclonePath}`);
           return rclonePath;
         }
       }

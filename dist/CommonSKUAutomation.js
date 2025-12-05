@@ -975,47 +975,100 @@ class CommonSKUAutomation {
                 'button:has-text("Generate Report")',
                 'button:has-text("Run Report")'
             ];
+            let reportButtonClicked = false;
             for (const selector of getReportSelectors) {
                 const element = await this.page.$(selector);
                 if (element) {
                     await element.click();
+                    reportButtonClicked = true;
                     logger_1.default.info('Clicked Get Report button');
                     break;
                 }
             }
-            await this.page.waitForTimeout(7000);
+            if (!reportButtonClicked) {
+                logger_1.default.warn('Could not find Get Report button, continuing anyway...');
+            }
+            // Wait longer for report to generate (sales rep can be slow)
+            logger_1.default.info('Waiting for report to generate...');
+            await this.page.waitForTimeout(10000);
+            // Set up download promise BEFORE opening dropdown
+            const downloadPromise = this.page.waitForEvent('download', { timeout: 45000 });
             logger_1.default.info('Opening Actions dropdown...');
             const actionsSelectors = [
                 'button:has-text("Actions")',
+                'button.btn-default:has-text("Actions")',
+                'button[aria-haspopup="true"]:has-text("Actions")',
                 'button:has-text("Export")',
-                '.actions-dropdown'
+                '.actions-dropdown',
+                '[data-testid="actions-dropdown"]'
             ];
+            let actionsOpened = false;
             for (const selector of actionsSelectors) {
-                const element = await this.page.$(selector);
-                if (element) {
-                    await element.click();
-                    await this.page.waitForTimeout(1000);
-                    break;
-                }
-            }
-            logger_1.default.info('Clicking Export Report...');
-            const downloadPromise = this.page.waitForEvent('download', { timeout: 30000 });
-            const exportSelectors = [
-                'text="Export Report"',
-                'text="Export"',
-                'text="Download Report"'
-            ];
-            for (const selector of exportSelectors) {
                 try {
                     const element = await this.page.$(selector);
-                    if (element) {
+                    if (element && await element.isVisible()) {
                         await element.click();
+                        actionsOpened = true;
+                        logger_1.default.info(`Opened Actions dropdown with selector: ${selector}`);
+                        await this.page.waitForTimeout(1500);
                         break;
                     }
                 }
                 catch (e) {
-                    // Continue
+                    // Continue trying other selectors
                 }
+            }
+            if (!actionsOpened) {
+                logger_1.default.warn('Could not open Actions dropdown with standard selectors, trying alternative methods...');
+                // Try to find any button containing "Actions" text
+                const actionButtons = await this.page.$$('button');
+                for (const btn of actionButtons) {
+                    const text = await btn.textContent();
+                    if (text && text.toLowerCase().includes('action')) {
+                        await btn.click();
+                        actionsOpened = true;
+                        logger_1.default.info('Found and clicked Actions button via text search');
+                        await this.page.waitForTimeout(1500);
+                        break;
+                    }
+                }
+            }
+            logger_1.default.info('Clicking Export Report...');
+            const exportSelectors = [
+                'text="Export Report"',
+                'a:has-text("Export Report")',
+                'button:has-text("Export Report")',
+                '[role="menuitem"]:has-text("Export")',
+                'text="Export"',
+                'text="Download Report"',
+                'a:has-text("Export")',
+                'li:has-text("Export Report")'
+            ];
+            let exportClicked = false;
+            for (const selector of exportSelectors) {
+                try {
+                    const elements = await this.page.$$(selector);
+                    for (const element of elements) {
+                        if (await element.isVisible()) {
+                            await element.click();
+                            exportClicked = true;
+                            logger_1.default.info(`Clicked export with selector: ${selector}`);
+                            break;
+                        }
+                    }
+                    if (exportClicked)
+                        break;
+                }
+                catch (e) {
+                    // Continue trying other selectors
+                }
+            }
+            if (!exportClicked) {
+                // Take a screenshot before throwing
+                const screenshotPath = path.join(config_1.default.browser.downloadPath, `error_sr_export_${Date.now()}.png`);
+                await this.page.screenshot({ path: screenshotPath, fullPage: true });
+                logger_1.default.error(`Screenshot saved: ${screenshotPath}`);
+                throw new Error('Could not click Export Report button - check screenshot for UI state');
             }
             const download = await downloadPromise;
             const tempFileName = download.suggestedFilename();
