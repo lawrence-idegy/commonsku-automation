@@ -12,12 +12,16 @@ export type DateRange =
   | 'This Year'
   | 'Last Year';
 
-export type DaySchedule = 
+export type DaySchedule =
   | 'daily'
   | 'weekly'
   | 'monthly'
   | 'friday'
-  | 'all';
+  | 'all'
+  // NEW: SR-only modes (Sales Rep reports only)
+  | 'sr-daily'
+  | 'sr-weekly'
+  | 'sr-friday';
 
 export interface ReportResult {
   success: boolean;

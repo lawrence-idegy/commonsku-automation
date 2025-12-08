@@ -88,6 +88,16 @@ async function main() {
             case 'all':
                 await scheduler.runScheduledReports('all');
                 break;
+            // NEW: SR-only commands (Sales Rep reports only)
+            case 'sr-daily':
+                await scheduler.runScheduledReports('sr-daily');
+                break;
+            case 'sr-weekly':
+                await scheduler.runScheduledReports('sr-weekly');
+                break;
+            case 'sr-friday':
+                await scheduler.runScheduledReports('sr-friday');
+                break;
             case 'cron':
                 // Start the scheduler
                 scheduler.startScheduler();
@@ -99,36 +109,40 @@ CommonSKU Reports Automation
 
 Usage: npm run [command] [options]
 
-Commands:
+=== SR-ONLY COMMANDS (RECOMMENDED) ===
+  npm run sr-daily       Export Sales Rep report (Today only)
+  npm run sr-weekly      Export Sales Rep report (This Week only)
+  npm run sr-friday      Export Sales Rep reports (all periods: Today, This Week, Last Week, This Month, Last Month, This Year)
+  npm run scheduled      Run based on today's schedule (Mon-Thu: sr-daily, Fri: sr-friday)
+
+=== LEGACY COMMANDS (all 3 report types) ===
   npm run dashboard [dateRange]     Export dashboard report
   npm run pipeline [dateRange]      Export pipeline report
   npm run sales-orders [dateRange]  Export sales orders report
-  
-  npm run scheduled    Run reports based on today's schedule
-  npm run daily        Export daily reports (dashboard, pipeline)
-  npm run weekly       Export weekly reports (all three)
-  npm run monthly      Export monthly reports (all three)
-  npm run friday       Export all Friday reports (all periods)
-  npm run all          Export all reports for all periods
-  
+  npm run daily        Export all 3 reports (Today)
+  npm run weekly       Export all 3 reports (This Week)
+  npm run monthly      Export all 3 reports (This Month)
+  npm run friday       Export all 3 reports (all periods - 18 reports)
+  npm run all          Same as friday
+
+=== SCHEDULER ===
   npm run cron         Start the scheduler (runs every day at 5 PM EST)
 
 Date Ranges:
   Today, This Week, Last Week, This Month, Last Month, This Year, Last Year
 
 Examples:
-  npm run dashboard "This Week"
-  npm run pipeline Today
-  npm run sales-orders "Last Month"
-  npm run scheduled
-  npm run cron
+  npm run sr-daily                   # Just today's Sales Rep report
+  npm run sr-friday                  # Friday's 6 Sales Rep reports
+  npm run sales-orders "This Month"  # Sales Rep for This Month
+  npm run scheduled                  # Auto-detect based on day of week
 
-Schedule:
-  Runs every day at 5:00 PM EST
-  Exports all three reports: Dashboard, Pipeline, and Sales Rep
+Schedule (sr-only mode):
+  Mon-Thu: sr-daily (1 report)
+  Friday:  sr-friday (6 reports)
 
 Files are saved to: ${process.env.DOWNLOAD_DIR || 'C:\\Users\\Lawrence\\Downloads'}
-File naming format: dash-monday-112025.csv (reporttype-dayofweek-MMYYYY.csv)
+File naming format: sr-monday-122025.csv (reporttype-dayofweek-MMYYYY.csv)
         `);
                 break;
         }

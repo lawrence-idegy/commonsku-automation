@@ -20,6 +20,11 @@
     "monthly": "npm run build && node dist/index.js monthly",
     "friday": "npm run build && node dist/index.js friday",
     "all": "npm run build && node dist/index.js all",
+    "sr-daily": "npm run build && node dist/index.js sr-daily",
+    "sr-weekly": "npm run build && node dist/index.js sr-weekly",
+    "sr-friday": "npm run build && node dist/index.js sr-friday",
+    "scheduled": "npm run build && node dist/index.js scheduled",
+    "cron": "npm run build && node dist/index.js cron",
     "package": "npm run build:all && electron-builder"
   },
   "build": {

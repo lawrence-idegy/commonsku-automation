@@ -672,10 +672,10 @@ export class CommonSKUAutomation {
       
       // Click Export Report
       logger.info('Clicking Export Report...');
-      
-      // Set up download promise before clicking
-      const downloadPromise = this.page.waitForEvent('download', { timeout: 30000 });
-      
+
+      // Set up download promise before clicking (increased timeout for reliability)
+      const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
+
       const exportSelectors = [
         'text="Export Report"',
         'text="Export"',
@@ -891,8 +891,8 @@ export class CommonSKUAutomation {
       }
       
       logger.info('Clicking Export Report...');
-      const downloadPromise = this.page.waitForEvent('download', { timeout: 30000 });
-      
+      const downloadPromise = this.page.waitForEvent('download', { timeout: 60000 });
+
       const exportSelectors = [
         'text="Export Report"',
         'text="Export"',
@@ -1080,10 +1080,10 @@ export class CommonSKUAutomation {
 
       // Wait longer for report to generate (sales rep can be slow)
       logger.info('Waiting for report to generate...');
-      await this.page.waitForTimeout(10000);
+      await this.page.waitForTimeout(15000);
 
-      // Set up download promise BEFORE opening dropdown
-      const downloadPromise = this.page.waitForEvent('download', { timeout: 45000 });
+      // Set up download promise BEFORE opening dropdown (increased timeout for reliability)
+      const downloadPromise = this.page.waitForEvent('download', { timeout: 90000 });
 
       logger.info('Opening Actions dropdown...');
       const actionsSelectors = [
