@@ -43,24 +43,17 @@ class ReportScheduler {
     }
     /**
      * Determine what reports to run based on the day of week
-     * New schedule:
-     * - Daily (Mon-Thu): Download daily reports
-     * - Wednesday: Also download monthly reports
-     * - Friday: Download daily, weekly, previous week, monthly, previous month, and YTD
+     * Schedule:
+     * - Mon-Thu: Daily reports + sr-weekly
+     * - Friday: Daily + weekly + previous week + monthly + previous month + YTD
      */
     getScheduleForToday() {
         const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
         switch (today) {
-            case 1: // Monday
-            case 2: // Tuesday
-            case 4: // Thursday
-                return 'daily';
-            case 3: // Wednesday
-                return 'monthly'; // Download monthly reports on Wednesdays
             case 5: // Friday
-                return 'friday'; // Download all: daily, weekly, previous week, monthly, previous month, YTD
-            default:
-                return 'daily'; // Weekend fallback
+                return 'friday';
+            default: // Mon-Thu + weekends
+                return 'daily';
         }
     }
     /**
@@ -74,14 +67,14 @@ class ReportScheduler {
                 case 'daily':
                     await this.runDailyReports();
                     break;
+                case 'friday':
+                    await this.runFridayReports();
+                    break;
                 case 'weekly':
                     await this.runWeeklyReports();
                     break;
                 case 'monthly':
                     await this.runMonthlyReports();
-                    break;
-                case 'friday':
-                    await this.runFridayReports();
                     break;
                 case 'all':
                     await this.runAllReports();
@@ -129,21 +122,37 @@ class ReportScheduler {
     }
     async runFridayReports() {
         logger_1.logger.info('Running Friday reports (comprehensive batch)...');
-        // Friday: Download daily, weekly, previous week, monthly, previous month, and YTD
-        const periods = [
-            'Today', // Daily
-            'This Week', // Weekly
-            'Last Week', // Previous week
-            'This Month', // Monthly
-            'Last Month', // Previous month
-            'This Year' // YTD
-        ];
-        for (const period of periods) {
-            logger_1.logger.info(`Generating ${period} reports...`);
-            await this.automation.exportDashboardReport(period);
-            await this.automation.exportPipelineReport(period);
-            await this.automation.exportSalesOrdersReport(period);
-        }
+        // Friday: Daily reports + sr-weekly + weekly + previous week + monthly + previous month + YTD
+        // 1. Daily reports (same as Mon-Thu)
+        logger_1.logger.info('Generating daily reports (Today)...');
+        await this.automation.exportDashboardReport('Today');
+        await this.automation.exportPipelineReport('Today');
+        await this.automation.exportSalesOrdersReport('Today');
+        await this.automation.exportSalesOrdersReport('This Week'); // sr-weekly
+        // 2. Weekly reports (all 3)
+        logger_1.logger.info('Generating weekly reports (This Week)...');
+        await this.automation.exportDashboardReport('This Week');
+        await this.automation.exportPipelineReport('This Week');
+        // 3. Previous week reports (all 3)
+        logger_1.logger.info('Generating previous week reports (Last Week)...');
+        await this.automation.exportDashboardReport('Last Week');
+        await this.automation.exportPipelineReport('Last Week');
+        await this.automation.exportSalesOrdersReport('Last Week');
+        // 4. Monthly reports (all 3)
+        logger_1.logger.info('Generating monthly reports (This Month)...');
+        await this.automation.exportDashboardReport('This Month');
+        await this.automation.exportPipelineReport('This Month');
+        await this.automation.exportSalesOrdersReport('This Month');
+        // 5. Previous month reports (all 3)
+        logger_1.logger.info('Generating previous month reports (Last Month)...');
+        await this.automation.exportDashboardReport('Last Month');
+        await this.automation.exportPipelineReport('Last Month');
+        await this.automation.exportSalesOrdersReport('Last Month');
+        // 6. YTD reports (all 3)
+        logger_1.logger.info('Generating YTD reports (This Year)...');
+        await this.automation.exportDashboardReport('This Year');
+        await this.automation.exportPipelineReport('This Year');
+        await this.automation.exportSalesOrdersReport('This Year');
     }
     async runAllReports() {
         logger_1.logger.info('Running all reports...');
