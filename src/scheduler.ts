@@ -13,17 +13,26 @@ export class ReportScheduler {
   /**
    * Determine what reports to run based on the day of week
    * Schedule:
-   * - Mon-Thu: Daily reports + sr-weekly
-   * - Friday: Daily + weekly + previous week + monthly + previous month + YTD
+   * - Mon, Tue, Thu: Daily reports + sr-weekly
+   * - Wednesday: Daily + sr-weekly + monthly (This Month & Last Month)
+   * - Friday: Daily + sr-weekly + weekly + previous week + monthly + previous month + YTD
    */
   getScheduleForToday(): DaySchedule {
     const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
 
     switch(today) {
+      case 1: // Monday
+      case 2: // Tuesday
+      case 4: // Thursday
+        return 'daily';
+
+      case 3: // Wednesday
+        return 'monthly';
+
       case 5: // Friday
         return 'friday';
 
-      default: // Mon-Thu + weekends
+      default: // Weekend fallback
         return 'daily';
     }
   }
@@ -94,11 +103,14 @@ export class ReportScheduler {
   private async runMonthlyReports(): Promise<void> {
     logger.info('Running monthly reports (Wednesday)...');
 
-    // On Wednesdays, download both daily and monthly reports
+    // On Wednesdays, download daily + sr-weekly + monthly reports
     // Daily reports
     await this.automation.exportDashboardReport('Today');
     await this.automation.exportPipelineReport('Today');
     await this.automation.exportSalesOrdersReport('Today');
+
+    // Sales Rep - This Week (sr-weekly)
+    await this.automation.exportSalesOrdersReport('This Week');
 
     // Monthly reports - This Month & Last Month
     await this.automation.exportDashboardReport('This Month');
