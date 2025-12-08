@@ -82,6 +82,9 @@ export class ReportScheduler {
 
     // Sales Rep - Today
     await this.automation.exportSalesOrdersReport('Today');
+
+    // Sales Rep - This Week (sr-weekly)
+    await this.automation.exportSalesOrdersReport('This Week');
   }
 
   private async runWeeklyReports(): Promise<void> {

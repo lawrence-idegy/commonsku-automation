@@ -100,6 +100,8 @@ class ReportScheduler {
         await this.automation.exportPipelineReport('Today');
         // Sales Rep - Today
         await this.automation.exportSalesOrdersReport('Today');
+        // Sales Rep - This Week (sr-weekly)
+        await this.automation.exportSalesOrdersReport('This Week');
     }
     async runWeeklyReports() {
         logger_1.logger.info('Running weekly reports...');
