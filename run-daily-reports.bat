@@ -1,7 +1,7 @@
 @echo off
 REM ========================================
-REM CommonSKU SR Daily Report - One Click
-REM Generates today's Sales Rep report ONLY
+REM CommonSKU Daily Reports - One Click
+REM Generates today's 3 reports quickly
 REM ========================================
 
 SETLOCAL EnableDelayedExpansion
@@ -20,14 +20,14 @@ REM Clear screen and show banner
 cls
 echo.
 echo %BLUE%========================================%RESET%
-echo %BLUE%  CommonSKU SR Daily Report Generator%RESET%
+echo %BLUE%  CommonSKU Daily Reports Generator%RESET%
 echo %BLUE%========================================%RESET%
 echo.
-echo %YELLOW%Starting SR daily report...%RESET%
+echo %YELLOW%Starting daily reports...%RESET%
 echo.
 
 REM Change to the project directory
-cd /d "C:\Users\Lawrence\Downloads\Work - Idegy\Operations\CCC\commonsku-automation"
+cd /d "C:\Users\Lawrence\Downloads\CCC\commonsku-automation"
 
 REM Check if node_modules exists
 if not exist "node_modules" (
@@ -55,32 +55,34 @@ if not exist "logs" mkdir logs
 if not exist "downloads" mkdir downloads
 
 REM Save output to log file
-set LOG_FILE=logs\sr-daily-run-%date:~-4,4%%date:~-10,2%%date:~-7,2%-%time:~0,2%%time:~3,2%%time:~6,2%.log
+set LOG_FILE=logs\daily-run-%date:~-4,4%%date:~-10,2%%date:~-7,2%-%time:~0,2%%time:~3,2%%time:~6,2%.log
 set LOG_FILE=%LOG_FILE: =0%
 
 echo %GREEN%Log file: %LOG_FILE%%RESET%
 echo.
 
-REM Run SR daily report
+REM Run daily reports
 echo %BLUE%====================================%RESET%
-echo %BLUE%  Generating Today's SR Report%RESET%
+echo %BLUE%  Generating Today's Reports%RESET%
 echo %BLUE%====================================%RESET%
 echo.
-echo Report to be generated:
-echo   Sales Rep Report (Today)
+echo Reports to be generated:
+echo   1. Dashboard Report (Today)
+echo   2. Pipeline Report (Today)
+echo   3. Sales Rep Report (Today)
 echo.
-echo %GREEN%Total: 1 report%RESET%
+echo %GREEN%Total: 3 reports%RESET%
 echo.
-echo %YELLOW%This will take approximately 30-60 seconds...%RESET%
+echo %YELLOW%This will take approximately 1-2 minutes...%RESET%
 echo.
 echo %YELLOW%Starting in 2 seconds...%RESET%
 timeout /t 2 /nobreak > nul
 echo.
 
-REM Run the SR daily reports command
-echo %GREEN%Executing: npm run sr-daily%RESET%
+REM Run the daily reports command
+echo %GREEN%Executing: npm run daily%RESET%
 echo.
-call npm run sr-daily
+call npm run daily
 
 REM Check if successful
 if errorlevel 1 (
@@ -101,7 +103,7 @@ if errorlevel 1 (
 REM Success message
 echo.
 echo %GREEN%========================================%RESET%
-echo %GREEN%  SUCCESS! SR Daily Report Generated%RESET%
+echo %GREEN%  SUCCESS! Daily Reports Generated%RESET%
 echo %GREEN%========================================%RESET%
 echo.
 
@@ -112,11 +114,16 @@ echo %BLUE%End Time:%RESET% %END_TIME%
 echo.
 
 REM Show file locations
-echo %YELLOW%Report saved to:%RESET%
+echo %YELLOW%Reports saved to:%RESET%
 echo   %CD%\downloads\
 echo.
-echo %YELLOW%SR files generated:%RESET%
-dir /b downloads\sr-*.csv 2>nul
+echo %YELLOW%Files generated:%RESET%
+dir /b downloads\*-daily-*.csv 2>nul
+dir /b downloads\*-monday-*.csv 2>nul
+dir /b downloads\*-tuesday-*.csv 2>nul
+dir /b downloads\*-wednesday-*.csv 2>nul
+dir /b downloads\*-thursday-*.csv 2>nul
+dir /b downloads\*-friday-*.csv 2>nul
 echo.
 
 REM Ask to open downloads folder

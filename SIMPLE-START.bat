@@ -24,8 +24,8 @@ echo %MAGENTA%========================================%RESET%
 echo.
 echo %CYAN%What would you like to do?%RESET%
 echo.
-echo   %GREEN%[1]%RESET% Generate Friday SR Reports (6 Sales Rep reports)
-echo   %BLUE%[2]%RESET% Generate Daily SR Report (1 Sales Rep report)
+echo   %GREEN%[1]%RESET% Generate ALL Friday Reports (18 reports)
+echo   %BLUE%[2]%RESET% Generate Daily Reports Only (3 reports)
 echo   %YELLOW%[3]%RESET% Open Downloads Folder
 echo   %YELLOW%[4]%RESET% View Logs
 echo   %RED%[5]%RESET% Exit
@@ -48,9 +48,9 @@ goto MENU
 :FRIDAY
 cls
 echo.
-echo %GREEN%Starting Friday SR Reports (6 Sales Rep reports)...%RESET%
+echo %GREEN%Starting Friday Reports (All 18)...%RESET%
 echo.
-call RUN-FRIDAY-FIXED.bat
+call run-friday-reports.bat
 echo.
 echo %YELLOW%Press any key to return to menu...%RESET%
 pause >nul
@@ -59,7 +59,7 @@ goto MENU
 :DAILY
 cls
 echo.
-echo %BLUE%Starting Daily SR Report (1 Sales Rep report)...%RESET%
+echo %BLUE%Starting Daily Reports (3 reports)...%RESET%
 echo.
 call run-daily-reports.bat
 echo.

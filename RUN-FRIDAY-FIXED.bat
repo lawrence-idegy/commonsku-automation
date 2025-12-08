@@ -1,8 +1,7 @@
 @echo off
 REM ========================================
-REM Friday SR Reports - FIXED VERSION
+REM Friday Reports - FIXED VERSION
 REM This WILL stay open and show progress
-REM Sales Rep reports ONLY (not dash/pipe)
 REM ========================================
 
 SETLOCAL EnableDelayedExpansion
@@ -10,18 +9,18 @@ SETLOCAL EnableDelayedExpansion
 cls
 echo.
 echo ============================================
-echo   CommonSKU Friday SR Reports Generator
+echo   CommonSKU Friday Reports Generator
 echo ============================================
 echo.
-echo This will generate 6 Sales Rep reports:
-echo   - Today (1 report)
-echo   - This Week (1 report)
-echo   - Last Week (1 report)
-echo   - This Month (1 report)
-echo   - Last Month (1 report)
-echo   - This Year/YTD (1 report)
+echo This will generate 18 reports:
+echo   - Today (3 reports)
+echo   - This Week (3 reports)
+echo   - Last Week (3 reports)
+echo   - This Month (3 reports)
+echo   - Last Month (3 reports)
+echo   - This Year/YTD (3 reports)
 echo.
-echo Estimated time: 3-5 minutes
+echo Estimated time: 10-12 minutes
 echo.
 echo The browser will open and you'll see it working!
 echo.
@@ -29,7 +28,7 @@ echo Press CTRL+C to cancel, or
 pause
 
 REM Change to project directory
-cd /d "C:\Users\Lawrence\Downloads\Work - Idegy\Operations\CCC\commonsku-automation"
+cd /d "C:\Users\Lawrence\Downloads\CCC\commonsku-automation"
 
 echo.
 echo ============================================
@@ -55,9 +54,9 @@ REM Create folders
 if not exist "downloads" mkdir downloads
 if not exist "logs" mkdir logs
 
-echo Starting Friday SR reports...
+echo Starting Friday reports...
 echo.
-echo Command: npm run sr-friday
+echo Command: npm run friday
 echo.
 echo ============================================
 echo.
@@ -66,8 +65,8 @@ REM Record start time
 echo Start Time: %TIME%
 echo.
 
-REM Run the actual command - THIS WILL TAKE 3-5 MINUTES
-call npm run sr-friday
+REM Run the actual command - THIS WILL TAKE 10-12 MINUTES
+call npm run friday
 
 REM Record end time
 echo.

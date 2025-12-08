@@ -15,9 +15,6 @@ on:
         type: choice
         options:
           - scheduled
-          - sr-daily
-          - sr-weekly
-          - sr-friday
           - daily
           - weekly
           - monthly
